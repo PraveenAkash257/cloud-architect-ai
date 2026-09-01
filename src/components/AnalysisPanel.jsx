@@ -1,5 +1,5 @@
 import { RESILIENCE } from "../utils/simulateFailure";
-import { REGIONS, azOptionsForRegion } from "../data/regions";
+import AsiaRegionMap from "./AsiaRegionMap";
 
 const RESILIENCE_COLOR = {
   [RESILIENCE.CRITICAL]: "#ff3b3b",
@@ -34,7 +34,6 @@ export default function AnalysisPanel({
   onClearRiskScan,
 }) {
   const region = selectedNode?.data?.region || "";
-  const azOptions = azOptionsForRegion(region);
 
   return (
     <aside style={{ width: "320px", padding: "14px", borderLeft: "1px solid #333", overflowY: "auto", fontSize: "13px" }}>
@@ -52,30 +51,12 @@ export default function AnalysisPanel({
                 Simulate Failure
               </button>
             </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <label style={{ display: "flex", flexDirection: "column", gap: "3px", fontSize: "11px", color: "#aaa" }}>
-                Region
-                <select value={region} onChange={(e) => onSetRegion(selectedNode.id, e.target.value)}>
-                  <option value="">— none —</option>
-                  {REGIONS.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label style={{ display: "flex", flexDirection: "column", gap: "3px", fontSize: "11px", color: "#aaa" }}>
-                Availability Zone
-                <select value={selectedNode?.data?.az || ""} onChange={(e) => onSetAz(selectedNode.id, e.target.value)} disabled={!region}>
-                  <option value="">— none —</option>
-                  {azOptions.map((az) => (
-                    <option key={az} value={az}>
-                      {az}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            <AsiaRegionMap
+              selectedRegion={region}
+              selectedAz={selectedNode?.data?.az || ""}
+              onSelectRegion={(code) => onSetRegion(selectedNode.id, code)}
+              onSelectAz={(az) => onSetAz(selectedNode.id, az)}
+            />
           </div>
         ) : (
           <p style={{ color: "#888" }}>Click a component on the canvas to select it.</p>
