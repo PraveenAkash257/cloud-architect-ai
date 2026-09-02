@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -12,13 +12,60 @@ import {
 import "@xyflow/react/dist/style.css";
 import CloudNode from "./CloudNode";
 import RegionGroupNode from "./RegionGroupNode";
+import ContainerNode from "./ContainerNode";
 import AnalysisPanel from "./AnalysisPanel";
 import { getComponentMeta } from "../data/componentTypes";
+import { getGroupMeta } from "../data/groupTypes";
 import { simulateFailure, detectFailurePoints, SIM_STATE } from "../utils/simulateFailure";
 import { toCanonicalArchitecture } from "../utils/architecture";
 import { buildFallbackExplanation, requestAiExplanation, validateAiExplanation } from "../utils/aiExplain";
+import { generateTerraform } from "../utils/terraformGenerator";
+import TerraformModal from "./TerraformModal";
 
-const nodeTypes = { cloudNode: CloudNode, regionGroup: RegionGroupNode };
+const nodeTypes = { cloudNode: CloudNode, regionGroup: RegionGroupNode, container: ContainerNode };
+
+// Walks up the parentId chain to find a node's absolute canvas position,
+// since child nodes store positions relative to their parent container.
+function getAbsolutePosition(node, nodesById) {
+  let x = node.position.x;
+  let y = node.position.y;
+  let current = node;
+  while (current.parentId && nodesById.has(current.parentId)) {
+    const parent = nodesById.get(current.parentId);
+    x += parent.position.x;
+    y += parent.position.y;
+    current = parent;
+  }
+  return { x, y };
+}
+
+function getNodeSize(node) {
+  const width = node.style?.width || 260;
+  const height = node.style?.height || 180;
+  return { width, height };
+}
+
+// Finds the smallest (most specific/innermost) container node whose
+// on-canvas bounds contain the given absolute point. Used to auto-nest
+// whatever gets dropped on top of an existing container.
+function findInnermostContainerAt(nodes, absX, absY, excludeId) {
+  const nodesById = new Map(nodes.map((n) => [n.id, n]));
+  let best = null;
+  let bestArea = Infinity;
+  for (const n of nodes) {
+    if (n.type !== "container" || n.id === excludeId) continue;
+    const pos = getAbsolutePosition(n, nodesById);
+    const { width, height } = getNodeSize(n);
+    if (absX >= pos.x && absX <= pos.x + width && absY >= pos.y && absY <= pos.y + height) {
+      const area = width * height;
+      if (area < bestArea) {
+        bestArea = area;
+        best = n;
+      }
+    }
+  }
+  return best;
+}
 let idCounter = 1;
 const getId = () => `node_${idCounter++}`;
 
@@ -68,18 +115,27 @@ function computeRegionGroups(nodes) {
   }));
 }
 
-function CanvasInner({ onExport }) {
+function CanvasInner({ onExport, initialArchitecture }) {
   const wrapperRef = useRef(null);
-  const [nodes, setNodes, onNodesChangeBase] = useNodesState([]);
-  const [edges, setEdges, onEdgesChangeBase] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChangeBase] = useNodesState(initialArchitecture?.nodes || []);
+  const [edges, setEdges, onEdgesChangeBase] = useEdgesState(initialArchitecture?.edges || []);
   const [rfInstance, setRfInstance] = useState(null);
-  const [entryPointId, setEntryPointId] = useState(null);
+  const [entryPointId, setEntryPointId] = useState(initialArchitecture?.entryPoint || null);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [simResult, setSimResult] = useState(null);
   const [validationMessage, setValidationMessage] = useState(null);
   const [explanation, setExplanation] = useState(null);
   const [riskScan, setRiskScan] = useState(null);
   const [riskScanMessage, setRiskScanMessage] = useState(null);
+  const [showTerraformModal, setShowTerraformModal] = useState(false);
+
+  useEffect(() => {
+    if (initialArchitecture) {
+      if (initialArchitecture.nodes) setNodes(initialArchitecture.nodes);
+      if (initialArchitecture.edges) setEdges(initialArchitecture.edges);
+      if (initialArchitecture.entryPoint) setEntryPointId(initialArchitecture.entryPoint);
+    }
+  }, [initialArchitecture, setNodes, setEdges]);
 
   // A stable click handler stored on every node's data. It never closes
   // over nodes/edges/entryPoint, so it never needs to be recreated or
@@ -87,15 +143,6 @@ function CanvasInner({ onExport }) {
   const handleNodeClick = useCallback((nodeId) => {
     setSelectedNodeId(nodeId);
   }, []);
-
-  const applyNodeMeta = useCallback(
-    (nds) =>
-      nds.map((n) => ({
-        ...n,
-        data: { ...n.data, nodeId: n.id, onNodeClick: handleNodeClick },
-      })),
-    [handleNodeClick]
-  );
 
   const clearSimulationStyling = useCallback(() => {
     setNodes((nds) => nds.map((n) => ({ ...n, data: { ...n.data, status: undefined } })));
@@ -123,6 +170,26 @@ function CanvasInner({ onExport }) {
     if (simResult) resetSimulation();
     if (riskScan) clearRiskScan();
   }, [simResult, resetSimulation, riskScan, clearRiskScan]);
+
+  const deleteNode = useCallback(
+    (nodeId) => {
+      clearStaleSimIfActive();
+      setEntryPointId((curr) => (curr === nodeId ? null : curr));
+      setSelectedNodeId((curr) => (curr === nodeId ? null : curr));
+      setNodes((nds) => nds.filter((n) => n.id !== nodeId && n.parentId !== nodeId));
+      setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
+    },
+    [clearStaleSimIfActive, setNodes, setEdges]
+  );
+
+  const applyNodeMeta = useCallback(
+    (nds) =>
+      nds.map((n) => ({
+        ...n,
+        data: { ...n.data, nodeId: n.id, onNodeClick: handleNodeClick, onDeleteNode: deleteNode },
+      })),
+    [handleNodeClick, deleteNode]
+  );
 
   const onConnect = useCallback(
     (params) => {
@@ -153,29 +220,61 @@ function CanvasInner({ onExport }) {
     e.dataTransfer.dropEffect = "move";
   }, []);
 
+  const renameContainer = useCallback(
+    (id, label) => {
+      setNodes((nds) => nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, label } } : n)));
+    },
+    [setNodes]
+  );
+
   const onDrop = useCallback(
     (e) => {
       e.preventDefault();
-      const type = e.dataTransfer.getData("application/reactflow");
-      if (!type || !rfInstance) return;
+      const raw = e.dataTransfer.getData("application/reactflow");
+      if (!raw || !rfInstance) return;
       clearStaleSimIfActive();
       const bounds = wrapperRef.current.getBoundingClientRect();
-      const position = rfInstance.screenToFlowPosition({
+      const dropPosition = rfInstance.screenToFlowPosition({
         x: e.clientX - bounds.left,
         y: e.clientY - bounds.top,
       });
-      const meta = getComponentMeta(type);
+      const parent = findInnermostContainerAt(nodes, dropPosition.x, dropPosition.y, null);
+      const parentAbs = parent ? getAbsolutePosition(parent, new Map(nodes.map((n) => [n.id, n]))) : null;
+      const relativePos = parent
+        ? { x: dropPosition.x - parentAbs.x, y: dropPosition.y - parentAbs.y }
+        : dropPosition;
+
+      if (raw.startsWith("container:")) {
+        const groupType = raw.replace("container:", "");
+        const meta = getGroupMeta(groupType);
+        const id = getId();
+        setNodes((nds) =>
+          nds.concat({
+            id,
+            type: "container",
+            position: relativePos,
+            style: { width: meta?.defaultWidth || 260, height: meta?.defaultHeight || 180 },
+            ...(parent ? { parentId: parent.id, extent: "parent" } : {}),
+            zIndex: -1,
+            data: { groupType, label: meta?.label || groupType, onRename: renameContainer, onDeleteNode: deleteNode },
+          })
+        );
+        return;
+      }
+
+      const meta = getComponentMeta(raw);
       const id = getId();
       setNodes((nds) =>
         nds.concat({
           id,
           type: "cloudNode",
-          position,
-          data: { label: meta?.label || type, componentType: type, nodeId: id, onNodeClick: handleNodeClick },
+          position: relativePos,
+          ...(parent ? { parentId: parent.id, extent: "parent" } : {}),
+          data: { label: meta?.label || raw, componentType: raw, nodeId: id, onNodeClick: handleNodeClick, onDeleteNode: deleteNode },
         })
       );
     },
-    [rfInstance, setNodes, handleNodeClick, clearStaleSimIfActive]
+    [rfInstance, setNodes, handleNodeClick, deleteNode, clearStaleSimIfActive, nodes, renameContainer]
   );
 
   const setEntryPoint = useCallback(
@@ -286,10 +385,28 @@ function CanvasInner({ onExport }) {
   const exportArchitecture = () => {
     const architecture = toCanonicalArchitecture(nodes, edges, entryPointId);
     console.log("Architecture JSON:", architecture);
+    const blob = new Blob([JSON.stringify(architecture, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "architecture.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     if (onExport) onExport(architecture);
   };
 
   const selectedNode = useMemo(() => nodes.find((n) => n.id === selectedNodeId) || null, [nodes, selectedNodeId]);
+
+  const activeRegion = useMemo(() => {
+    return nodes.find((n) => n.data?.region)?.data?.region || "ap-south-1";
+  }, [nodes]);
+
+  const terraformCode = useMemo(() => {
+    const architecture = toCanonicalArchitecture(nodes, edges, entryPointId);
+    return generateTerraform(architecture, activeRegion);
+  }, [nodes, edges, entryPointId, activeRegion]);
 
   const displayNodes = useMemo(
     () => applyNodeMeta(nodes).map((n) => ({ ...n, data: { ...n.data, isEntryPoint: n.id === entryPointId } })),
@@ -303,11 +420,41 @@ function CanvasInner({ onExport }) {
     <div style={{ width: "100%", height: "100%", position: "relative", display: "flex" }}>
       <div style={{ flex: 1, position: "relative" }} ref={wrapperRef}>
         <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, display: "flex", gap: "8px", alignItems: "center" }}>
-          <button onClick={exportArchitecture} style={{ padding: "8px 14px" }}>
-            Export JSON
+          <button
+            onClick={() => setShowTerraformModal(true)}
+            style={{
+              padding: "8px 14px",
+              background: "#0284c7",
+              color: "#ffffff",
+              border: "1px solid #0369a1",
+              borderRadius: "6px",
+              fontWeight: 600,
+              fontSize: "12px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            }}
+          >
+            📦 Export Terraform (.tf)
+          </button>
+          <button
+            onClick={exportArchitecture}
+            style={{
+              padding: "8px 12px",
+              background: "#1e293b",
+              color: "#cbd5e1",
+              border: "1px solid #334155",
+              borderRadius: "6px",
+              fontSize: "12px",
+              cursor: "pointer",
+            }}
+          >
+            💾 Export JSON
           </button>
           {!entryPointId && (
-            <span style={{ padding: "8px 14px", color: "#ffb020", fontSize: "13px" }}>
+            <span style={{ padding: "6px 12px", color: "#ffb020", fontSize: "12px", background: "rgba(15,23,42,0.8)", borderRadius: "6px", border: "1px solid rgba(255,176,32,0.3)" }}>
               No entry point set — select a component and click &quot;Set as Entry Point&quot;.
             </span>
           )}
@@ -345,6 +492,14 @@ function CanvasInner({ onExport }) {
         onSetAz={setNodeAz}
         onDetectFailurePoints={runDetectFailurePoints}
         onClearRiskScan={clearRiskScan}
+        onDeleteNode={deleteNode}
+      />
+      <TerraformModal
+        isOpen={showTerraformModal}
+        onClose={() => setShowTerraformModal(false)}
+        terraformCode={terraformCode}
+        resourceCount={nodes.length}
+        region={activeRegion}
       />
     </div>
   );

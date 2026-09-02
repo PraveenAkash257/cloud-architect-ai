@@ -13,8 +13,11 @@ export function toCanonicalArchitecture(nodes, edges, entryPointId) {
     entryPoint: entryPointId || null,
     nodes: nodes.map((n) => ({
       id: n.id,
-      type: n.data.componentType,
-      label: n.data.label,
+      type: n.data?.componentType || n.type,
+      label: n.data?.label || n.id,
+      region: n.data?.region,
+      az: n.data?.az,
+      parentId: n.parentId,
     })),
     edges: edges.map((e) => ({ source: e.source, target: e.target })),
   };

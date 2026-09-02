@@ -1,4 +1,5 @@
 import { COMPONENT_TYPES } from "../data/componentTypes";
+import { GROUP_TYPES } from "../data/groupTypes";
 
 const CATEGORIES = ["compute", "data", "networking", "security"];
 
@@ -38,6 +39,38 @@ function Palette() {
           ))}
         </div>
       ))}
+
+      <div style={{ marginBottom: "14px", borderTop: "1px solid #333", paddingTop: "12px" }}>
+        <h4 style={{ fontSize: "11px", textTransform: "uppercase", color: "#888" }}>Containers</h4>
+        {GROUP_TYPES.map((g) => (
+          <div
+            key={g.type}
+            draggable
+            onDragStart={(event) => onDragStart(event, `container:${g.type}`)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              borderLeft: `4px solid ${g.color}`,
+              padding: "8px 10px",
+              marginBottom: "6px",
+              cursor: "grab",
+            }}
+            title={`${g.label} — a resizable grouping box`}
+          >
+            <span
+              style={{
+                width: "18px",
+                height: "14px",
+                border: `1.5px solid ${g.color}`,
+                borderRadius: "2px",
+                display: "inline-block",
+              }}
+            />
+            <span>{g.label}</span>
+          </div>
+        ))}
+      </div>
     </aside>
   );
 }

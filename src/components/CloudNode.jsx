@@ -39,8 +39,8 @@ function CloudNode({ data }) {
           : "none",
         borderRadius: "8px",
         padding: "10px 14px",
-        background: "#1c1f2b",
-        color: "white",
+        background: "#ffffff",
+        color: "#232323",
         minWidth: "150px",
         display: "flex",
         flexDirection: "column",
@@ -50,6 +50,41 @@ function CloudNode({ data }) {
       }}
     >
       <Handle type="target" position={Position.Left} />
+
+      {/* Quick Delete button */}
+      {data.onDeleteNode && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            data.onDeleteNode(data.nodeId);
+          }}
+          title="Delete component"
+          style={{
+            position: "absolute",
+            top: "-7px",
+            right: "-7px",
+            width: "18px",
+            height: "18px",
+            borderRadius: "50%",
+            background: "#fee2e2",
+            border: "1px solid #ef4444",
+            color: "#dc2626",
+            fontSize: "12px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 0,
+            lineHeight: 1,
+            zIndex: 10,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+          }}
+        >
+          ×
+        </button>
+      )}
+
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <img src={meta?.icon} alt={data.label} style={{ width: "26px", height: "26px" }} />
         <span>{data.label}</span>
