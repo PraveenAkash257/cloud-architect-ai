@@ -417,24 +417,34 @@ function CanvasInner({ onExport, initialArchitecture }) {
   const flowNodes = useMemo(() => [...regionGroupNodes, ...displayNodes], [regionGroupNodes, displayNodes]);
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative", display: "flex" }}>
+    <div style={{ width: "100%", height: "100%", position: "relative", display: "flex", backgroundColor: "#f8fafc" }}>
       <div style={{ flex: 1, position: "relative" }} ref={wrapperRef}>
-        <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, display: "flex", gap: "8px", alignItems: "center" }}>
+        <div style={{ position: "absolute", top: 14, left: 14, zIndex: 10, display: "flex", gap: "10px", alignItems: "center" }}>
           <button
             onClick={() => setShowTerraformModal(true)}
             style={{
-              padding: "8px 14px",
-              background: "#0284c7",
+              padding: "8px 16px",
+              background: "linear-gradient(135deg, #0284c7 0%, #2563eb 100%)",
               color: "#ffffff",
-              border: "1px solid #0369a1",
-              borderRadius: "6px",
-              fontWeight: 600,
-              fontSize: "12px",
+              border: "none",
+              borderRadius: "12px",
+              fontWeight: 800,
+              fontFamily: "var(--font-heading)",
+              fontSize: "12.5px",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: "6px",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+              boxShadow: "0 4px 12px rgba(2, 132, 199, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(2, 132, 199, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(2, 132, 199, 0.3)";
             }}
           >
             📦 Export Terraform (.tf)
@@ -442,20 +452,43 @@ function CanvasInner({ onExport, initialArchitecture }) {
           <button
             onClick={exportArchitecture}
             style={{
-              padding: "8px 12px",
-              background: "#1e293b",
-              color: "#cbd5e1",
-              border: "1px solid #334155",
-              borderRadius: "6px",
-              fontSize: "12px",
+              padding: "8px 14px",
+              background: "#ffffff",
+              color: "#1e293b",
+              border: "1px solid #cbd5e1",
+              borderRadius: "12px",
+              fontSize: "12.5px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
               cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.borderColor = "#94a3b8";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = "#cbd5e1";
             }}
           >
             💾 Export JSON
           </button>
           {!entryPointId && (
-            <span style={{ padding: "6px 12px", color: "#ffb020", fontSize: "12px", background: "rgba(15,23,42,0.8)", borderRadius: "6px", border: "1px solid rgba(255,176,32,0.3)" }}>
-              No entry point set — select a component and click &quot;Set as Entry Point&quot;.
+            <span
+              style={{
+                padding: "6px 14px",
+                color: "#92400e",
+                fontSize: "12px",
+                fontWeight: 600,
+                background: "#fef3c7",
+                borderRadius: "12px",
+                border: "1px solid #fde68a",
+                boxShadow: "0 2px 6px rgba(245, 158, 11, 0.1)",
+              }}
+            >
+              ⚠️ No entry point set — select a component and click &quot;Set as Entry Point&quot;.
             </span>
           )}
         </div>
@@ -472,9 +505,9 @@ function CanvasInner({ onExport, initialArchitecture }) {
           nodeTypes={nodeTypes}
           fitView
         >
-          <Background />
+          <Background color="#cbd5e1" gap={16} />
           <Controls />
-          <MiniMap />
+          <MiniMap style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px" }} />
         </ReactFlow>
       </div>
       <AnalysisPanel

@@ -76,34 +76,50 @@ function App() {
 
   // 3. Main Architecture Canvas
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh", backgroundColor: "#f8fafc" }}>
       <Palette />
 
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
         <div
           style={{
-            height: "48px",
+            height: "56px",
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            padding: "0 16px",
-            background: "#0f1728",
-            borderBottom: "1px solid #26324a",
-            color: "white",
+            padding: "0 20px",
+            background: "#ffffff",
+            borderBottom: "1px solid #e2e8f0",
+            color: "#1e293b",
             fontSize: "13px",
+            fontFamily: "var(--font-heading)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            zIndex: 20,
           }}
         >
           <button
             onClick={() => setView("dashboard")}
             style={{
-              padding: "6px 10px",
-              background: "#172033",
-              color: "#94a3b8",
-              border: "1px solid #34415a",
-              borderRadius: "5px",
+              padding: "7px 14px",
+              background: "#f1f5f9",
+              color: "#334155",
+              border: "1px solid #cbd5e1",
+              borderRadius: "12px",
               cursor: "pointer",
-              fontSize: "12px",
-              fontWeight: 600,
+              fontSize: "12.5px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#0f172a";
+              e.currentTarget.style.borderColor = "#7c3aed";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#334155";
+              e.currentTarget.style.borderColor = "#cbd5e1";
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             ← Dashboard
@@ -112,46 +128,70 @@ function App() {
           <button
             onClick={() => setView("regionMap")}
             style={{
-              padding: "6px 10px",
-              background: "#172033",
-              color: "#94a3b8",
-              border: "1px solid #34415a",
-              borderRadius: "5px",
+              padding: "7px 14px",
+              background: "#f1f5f9",
+              color: "#334155",
+              border: "1px solid #cbd5e1",
+              borderRadius: "12px",
               cursor: "pointer",
-              fontSize: "12px",
-              fontWeight: 600,
+              fontSize: "12.5px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#0f172a";
+              e.currentTarget.style.borderColor = "#0284c7";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#334155";
+              e.currentTarget.style.borderColor = "#cbd5e1";
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             🗺️ Region Map
           </button>
 
           {architecture?.name && (
-            <span style={{ color: "#38bdf8", fontWeight: 700 }}>
+            <span style={{ color: "#7c3aed", fontWeight: 800, fontSize: "14px", marginLeft: "6px" }}>
               {architecture.name}
             </span>
           )}
 
-          <span style={{ color: "#64748b" }}>•</span>
+          <span style={{ color: "#cbd5e1" }}>•</span>
 
-          <span>
-            Region: <strong style={{ color: "#f8fafc" }}>{architecture?.region || "ap-south-1"}</strong>
+          <span style={{ fontSize: "12.5px", color: "#64748b" }}>
+            Region: <strong style={{ color: "#0f172a" }}>{architecture?.region || "ap-south-1"}</strong>
           </span>
 
-          <span>
-            AZ: <strong style={{ color: "#f8fafc" }}>{architecture?.az || "ap-south-1a"}</strong>
+          <span style={{ fontSize: "12.5px", color: "#64748b" }}>
+            AZ: <strong style={{ color: "#0f172a" }}>{architecture?.az || "ap-south-1a"}</strong>
           </span>
 
           <button
             onClick={handleSignOut}
             style={{
               marginLeft: "auto",
-              padding: "6px 12px",
-              background: "#172033",
-              color: "#cbd5e1",
-              border: "1px solid #34415a",
-              borderRadius: "5px",
+              padding: "7px 14px",
+              background: "#f1f5f9",
+              color: "#475569",
+              border: "1px solid #cbd5e1",
+              borderRadius: "12px",
               cursor: "pointer",
-              fontSize: "12px",
+              fontSize: "12.5px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#dc2626";
+              e.currentTarget.style.borderColor = "#fca5a5";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#475569";
+              e.currentTarget.style.borderColor = "#cbd5e1";
             }}
           >
             Log Out

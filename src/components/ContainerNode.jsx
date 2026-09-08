@@ -18,16 +18,18 @@ export default function ContainerNode({ id, data, selected }) {
         isVisible={selected}
         minWidth={140}
         minHeight={100}
-        lineStyle={{ borderColor: meta?.color || "#232323" }}
-        handleStyle={{ width: 8, height: 8, borderRadius: 2 }}
+        lineStyle={{ borderColor: meta?.color || "#0284c7" }}
+        handleStyle={{ width: 8, height: 8, borderRadius: 2, background: "#ffffff", border: "1.5px solid #0284c7" }}
       />
       <div
         style={{
           width: "100%",
           height: "100%",
-          border: `1.5px solid ${meta?.color || "#232323"}`,
-          borderRadius: "4px",
-          background: "rgba(255,255,255,0.55)",
+          border: `2px solid ${meta?.color || "#0284c7"}`,
+          borderRadius: "12px",
+          background: "rgba(255, 255, 255, 0.7)",
+          backdropFilter: "blur(4px)",
+          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
           position: "relative",
         }}
       >
@@ -43,13 +45,15 @@ export default function ContainerNode({ id, data, selected }) {
               top: "-12px",
               left: "12px",
               fontSize: "12px",
-              fontWeight: 600,
-              color: meta?.color || "#232323",
-              background: "#fff",
-              border: `1px solid ${meta?.color || "#232323"}`,
-              borderRadius: "3px",
-              padding: "1px 6px",
+              fontWeight: 800,
+              fontFamily: "var(--font-heading)",
+              color: meta?.color || "#0f172a",
+              background: "#ffffff",
+              border: `1.5px solid ${meta?.color || "#0284c7"}`,
+              borderRadius: "6px",
+              padding: "2px 8px",
               zIndex: 20,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
             }}
           />
         ) : (
@@ -61,12 +65,16 @@ export default function ContainerNode({ id, data, selected }) {
               top: "-11px",
               left: "12px",
               fontSize: "12px",
-              fontWeight: 600,
-              color: meta?.color || "#232323",
+              fontWeight: 800,
+              fontFamily: "var(--font-heading)",
+              color: meta?.color || "#0f172a",
               background: "#ffffff",
-              padding: "0 6px",
+              border: `1px solid ${meta?.color || "#e2e8f0"}`,
+              borderRadius: "6px",
+              padding: "2px 8px",
               cursor: "text",
               zIndex: 20,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
             }}
           >
             {label}
@@ -81,16 +89,16 @@ export default function ContainerNode({ id, data, selected }) {
             title="Delete group"
             style={{
               position: "absolute",
-              top: "-9px",
+              top: "-10px",
               right: "8px",
-              width: "18px",
-              height: "18px",
+              width: "20px",
+              height: "20px",
               borderRadius: "50%",
               background: "#fee2e2",
-              border: "1px solid #ef4444",
+              border: "1.5px solid #ef4444",
               color: "#dc2626",
-              fontSize: "12px",
-              fontWeight: "bold",
+              fontSize: "13px",
+              fontWeight: 800,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
@@ -98,7 +106,7 @@ export default function ContainerNode({ id, data, selected }) {
               padding: 0,
               lineHeight: 1,
               zIndex: 20,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.15)",
             }}
           >
             ×

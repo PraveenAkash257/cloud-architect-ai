@@ -2,21 +2,22 @@ import { RESILIENCE } from "../utils/simulateFailure";
 import { getComponentMeta } from "../data/componentTypes";
 
 const RESILIENCE_META = {
-  [RESILIENCE.CRITICAL]: { label: "CRITICAL", bg: "rgba(239, 68, 68, 0.15)", text: "#ef4444", border: "#ef4444" },
-  [RESILIENCE.LOW]: { label: "LOW", bg: "rgba(249, 115, 22, 0.15)", text: "#f97316", border: "#f97316" },
-  [RESILIENCE.MEDIUM]: { label: "MEDIUM", bg: "rgba(234, 179, 8, 0.15)", text: "#eab308", border: "#eab308" },
-  [RESILIENCE.HIGH]: { label: "HIGH", bg: "rgba(34, 197, 94, 0.15)", text: "#22c55e", border: "#22c55e" },
+  [RESILIENCE.CRITICAL]: { label: "CRITICAL", bg: "rgba(239, 68, 68, 0.12)", text: "#dc2626", border: "#fca5a5" },
+  [RESILIENCE.LOW]: { label: "LOW", bg: "rgba(249, 115, 22, 0.12)", text: "#ea580c", border: "#fdba74" },
+  [RESILIENCE.MEDIUM]: { label: "MEDIUM", bg: "rgba(234, 179, 8, 0.15)", text: "#ca8a04", border: "#fde047" },
+  [RESILIENCE.HIGH]: { label: "HIGH", bg: "rgba(34, 197, 94, 0.12)", text: "#16a34a", border: "#86efac" },
 };
 
 function PanelCard({ title, icon, children, style }) {
   return (
     <div
       style={{
-        background: "#161f30",
-        border: "1px solid #25334d",
-        borderRadius: "10px",
+        background: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        borderRadius: "14px",
         padding: "14px",
         marginBottom: "14px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
         ...style,
       }}
     >
@@ -26,11 +27,12 @@ function PanelCard({ title, icon, children, style }) {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            fontSize: "11px",
-            fontWeight: 700,
+            fontSize: "11.5px",
+            fontWeight: 800,
             textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            color: "#8fa0bc",
+            letterSpacing: "0.05em",
+            color: "#64748b",
+            fontFamily: "var(--font-heading)",
             marginBottom: "10px",
           }}
         >
@@ -64,45 +66,50 @@ export default function AnalysisPanel({
   return (
     <aside
       style={{
-        width: "350px",
-        background: "#0c1322",
-        borderLeft: "1px solid #1e2c44",
-        color: "#e2e8f0",
+        width: "360px",
+        background: "#ffffff",
+        borderLeft: "1px solid #e2e8f0",
+        color: "#1e293b",
         display: "flex",
         flexDirection: "column",
         height: "100%",
         boxSizing: "border-box",
+        fontFamily: "var(--font-body)",
+        boxShadow: "-2px 0 10px rgba(0, 0, 0, 0.02)",
+        zIndex: 10,
       }}
     >
       {/* Panel Header */}
       <div
         style={{
-          padding: "14px 16px",
-          borderBottom: "1px solid #1e2c44",
-          background: "#0f172a",
+          padding: "14px 18px",
+          borderBottom: "1px solid #e2e8f0",
+          background: "#f8fafc",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
         <div>
-          <h2 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#f8fafc", letterSpacing: "0.02em" }}>
+          <h2 style={{ margin: 0, fontSize: "15px", fontWeight: 900, color: "#0f172a", fontFamily: "var(--font-heading)" }}>
             Architecture Analysis
           </h2>
-          <span style={{ fontSize: "11px", color: "#64748b" }}>Failure simulation & risk detection</span>
+          <span style={{ fontSize: "11.5px", color: "#64748b" }}>Failure simulation & risk scanner</span>
         </div>
         {simResult && (
           <button
             onClick={onReset}
             style={{
-              padding: "4px 10px",
-              fontSize: "11px",
-              fontWeight: 600,
-              borderRadius: "5px",
-              background: "#1e293b",
-              border: "1px solid #334155",
-              color: "#94a3b8",
+              padding: "5px 12px",
+              fontSize: "11.5px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              borderRadius: "8px",
+              background: "#ffffff",
+              border: "1px solid #cbd5e1",
+              color: "#475569",
               cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
             }}
           >
             Reset
@@ -115,19 +122,20 @@ export default function AnalysisPanel({
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "14px 16px",
+          padding: "16px",
         }}
       >
         {/* Validation or Warning Alert */}
         {validationMessage && (
           <div
             style={{
-              padding: "10px 12px",
-              background: "rgba(245, 158, 11, 0.12)",
-              border: "1px solid rgba(245, 158, 11, 0.3)",
-              borderRadius: "8px",
-              color: "#fbbf24",
+              padding: "10px 14px",
+              background: "#fef3c7",
+              border: "1px solid #fde68a",
+              borderRadius: "10px",
+              color: "#92400e",
               fontSize: "12px",
+              fontWeight: 600,
               lineHeight: 1.4,
               marginBottom: "14px",
               display: "flex",
@@ -145,22 +153,25 @@ export default function AnalysisPanel({
             title="Simulation Result"
             icon="⚡"
             style={{
-              borderColor: simResult.singlePointOfFailure ? "#dc2626" : "#16a34a",
-              background: simResult.singlePointOfFailure ? "rgba(220, 38, 38, 0.08)" : "rgba(22, 163, 74, 0.08)",
+              borderColor: simResult.singlePointOfFailure ? "#fca5a5" : "#86efac",
+              background: simResult.singlePointOfFailure ? "#fef2f2" : "#f0fdf4",
             }}
           >
             {/* Failed Node Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
               <div>
-                <span style={{ fontSize: "11px", color: "#94a3b8", display: "block" }}>Failed Component</span>
-                <span style={{ fontSize: "14px", fontWeight: 700, color: "#f8fafc" }}>{simResult.failedLabel}</span>
+                <span style={{ fontSize: "11px", color: "#64748b", display: "block", fontWeight: 600 }}>Failed Component</span>
+                <span style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a", fontFamily: "var(--font-heading)" }}>
+                  {simResult.failedLabel}
+                </span>
               </div>
               <span
                 style={{
                   fontSize: "11px",
-                  fontWeight: 700,
+                  fontWeight: 800,
+                  fontFamily: "var(--font-heading)",
                   padding: "3px 8px",
-                  borderRadius: "4px",
+                  borderRadius: "6px",
                   background: RESILIENCE_META[simResult.resilience]?.bg,
                   color: RESILIENCE_META[simResult.resilience]?.text,
                   border: `1px solid ${RESILIENCE_META[simResult.resilience]?.border}`,
@@ -173,14 +184,14 @@ export default function AnalysisPanel({
             {/* SPOF Banner */}
             <div
               style={{
-                padding: "8px 10px",
-                borderRadius: "6px",
-                background: simResult.singlePointOfFailure ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.15)",
-                border: `1px solid ${simResult.singlePointOfFailure ? "#ef4444" : "#22c55e"}`,
+                padding: "8px 12px",
+                borderRadius: "8px",
+                background: simResult.singlePointOfFailure ? "#fee2e2" : "#dcfce7",
+                border: `1px solid ${simResult.singlePointOfFailure ? "#f87171" : "#4ade80"}`,
                 marginBottom: "12px",
                 fontSize: "12px",
-                fontWeight: 600,
-                color: simResult.singlePointOfFailure ? "#fca5a5" : "#86efac",
+                fontWeight: 700,
+                color: simResult.singlePointOfFailure ? "#991b1b" : "#166534",
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
@@ -195,34 +206,38 @@ export default function AnalysisPanel({
             </div>
 
             {/* Reachability Metric Tiles */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px", marginBottom: "12px" }}>
-              <div style={{ background: "#0f172a", padding: "8px", borderRadius: "6px", textAlign: "center" }}>
-                <div style={{ fontSize: "16px", fontWeight: 700, color: "#22c55e" }}>{simResult.reachableCount}</div>
-                <div style={{ fontSize: "10px", color: "#64748b" }}>Reachable</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+              <div style={{ background: "#ffffff", padding: "10px 8px", borderRadius: "10px", border: "1px solid #e2e8f0", textAlign: "center" }}>
+                <div style={{ fontSize: "17px", fontWeight: 900, color: "#16a34a", fontFamily: "var(--font-heading)" }}>
+                  {simResult.reachableCount}
+                </div>
+                <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 600 }}>Reachable</div>
               </div>
-              <div style={{ background: "#0f172a", padding: "8px", borderRadius: "6px", textAlign: "center" }}>
-                <div style={{ fontSize: "16px", fontWeight: 700, color: "#ef4444" }}>{simResult.unreachableCount}</div>
-                <div style={{ fontSize: "10px", color: "#64748b" }}>Unreachable</div>
+              <div style={{ background: "#ffffff", padding: "10px 8px", borderRadius: "10px", border: "1px solid #e2e8f0", textAlign: "center" }}>
+                <div style={{ fontSize: "17px", fontWeight: 900, color: "#dc2626", fontFamily: "var(--font-heading)" }}>
+                  {simResult.unreachableCount}
+                </div>
+                <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 600 }}>Unreachable</div>
               </div>
-              <div style={{ background: "#0f172a", padding: "8px", borderRadius: "6px", textAlign: "center" }}>
-                <div style={{ fontSize: "16px", fontWeight: 700, color: "#94a3b8" }}>
+              <div style={{ background: "#ffffff", padding: "10px 8px", borderRadius: "10px", border: "1px solid #e2e8f0", textAlign: "center" }}>
+                <div style={{ fontSize: "17px", fontWeight: 900, color: "#64748b", fontFamily: "var(--font-heading)" }}>
                   {simResult.preExistingDisconnectedCount}
                 </div>
-                <div style={{ fontSize: "10px", color: "#64748b" }}>Isolated</div>
+                <div style={{ fontSize: "10.5px", color: "#64748b", fontWeight: 600 }}>Isolated</div>
               </div>
             </div>
 
             {/* AI Explanation / Root Cause */}
             {explanation && (
-              <div style={{ borderTop: "1px solid #25334d", paddingTop: "12px", marginTop: "8px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#93c5fd", marginBottom: "4px" }}>
+              <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "12px", marginTop: "8px" }}>
+                <div style={{ fontSize: "11.5px", fontWeight: 800, color: "#2563eb", fontFamily: "var(--font-heading)", marginBottom: "4px" }}>
                   {explanation.source === "fallback" ? "Analysis Summary" : "🤖 AI Analysis"}
                 </div>
-                <p style={{ fontSize: "12px", color: "#cbd5e1", lineHeight: 1.4, margin: "0 0 8px" }}>
+                <p style={{ fontSize: "12px", color: "#334155", lineHeight: 1.5, margin: "0 0 8px" }}>
                   {explanation.summary}
                 </p>
                 {explanation.failureCause && (
-                  <p style={{ fontSize: "11px", color: "#94a3b8", lineHeight: 1.4, margin: "0 0 10px" }}>
+                  <p style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.4, margin: "0 0 10px" }}>
                     <strong>Root Cause:</strong> {explanation.failureCause}
                   </p>
                 )}
@@ -230,23 +245,24 @@ export default function AnalysisPanel({
                 {/* Recommendations */}
                 {explanation.recommendations?.length > 0 && (
                   <div>
-                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#8fa0bc", marginBottom: "6px" }}>
+                    <div style={{ fontSize: "11.5px", fontWeight: 800, color: "#0f172a", fontFamily: "var(--font-heading)", marginBottom: "6px" }}>
                       Recommended Architecture Fixes
                     </div>
                     {explanation.recommendations.map((rec, i) => (
                       <div
                         key={i}
                         style={{
-                          background: "#0f172a",
-                          border: "1px solid #1e293b",
-                          borderRadius: "6px",
-                          padding: "8px 10px",
+                          background: "#ffffff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "10px",
+                          padding: "10px 12px",
                           marginBottom: "6px",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
                         }}
                       >
-                        <div style={{ fontWeight: 600, fontSize: "12px", color: "#f1f5f9" }}>{rec.title}</div>
-                        <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px" }}>{rec.reason}</div>
-                        <div style={{ fontSize: "11px", color: "#34d399", fontWeight: 500, marginTop: "4px" }}>
+                        <div style={{ fontWeight: 700, fontSize: "12px", color: "#0f172a" }}>{rec.title}</div>
+                        <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>{rec.reason}</div>
+                        <div style={{ fontSize: "11px", color: "#16a34a", fontWeight: 700, marginTop: "4px" }}>
                           ✓ {rec.expectedImprovement}
                         </div>
                       </div>
@@ -260,15 +276,17 @@ export default function AnalysisPanel({
               onClick={onReset}
               style={{
                 width: "100%",
-                padding: "8px",
+                padding: "9px",
                 marginTop: "10px",
-                background: "#1e293b",
-                border: "1px solid #334155",
-                borderRadius: "6px",
-                color: "#e2e8f0",
+                background: "#ffffff",
+                border: "1px solid #cbd5e1",
+                borderRadius: "10px",
+                color: "#334155",
                 fontSize: "12px",
-                fontWeight: 600,
+                fontWeight: 700,
+                fontFamily: "var(--font-heading)",
                 cursor: "pointer",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
               }}
             >
               Reset Simulation
@@ -285,11 +303,11 @@ export default function AnalysisPanel({
                   <img
                     src={selectedMeta.icon}
                     alt={selectedNode.data.label}
-                    style={{ width: "28px", height: "28px", flexShrink: 0 }}
+                    style={{ width: "30px", height: "30px", flexShrink: 0 }}
                   />
                 )}
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#f8fafc", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a", fontFamily: "var(--font-heading)", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {selectedNode.data.label}
                   </div>
                   <div style={{ fontSize: "11px", color: "#64748b" }}>
@@ -301,11 +319,12 @@ export default function AnalysisPanel({
                   <span
                     style={{
                       fontSize: "10px",
-                      fontWeight: 700,
-                      background: "#22c55e",
-                      color: "#052e16",
-                      padding: "2px 6px",
-                      borderRadius: "4px",
+                      fontWeight: 800,
+                      background: "#dcfce7",
+                      color: "#166534",
+                      border: "1px solid #86efac",
+                      padding: "2px 7px",
+                      borderRadius: "6px",
                     }}
                   >
                     ENTRY
@@ -319,14 +338,16 @@ export default function AnalysisPanel({
                   disabled={isSelectedEntry}
                   style={{
                     flex: 1,
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    border: isSelectedEntry ? "1px solid #22c55e" : "1px solid #3b82f6",
-                    background: isSelectedEntry ? "rgba(34, 197, 94, 0.15)" : "#1d4ed8",
-                    color: isSelectedEntry ? "#86efac" : "white",
+                    padding: "9px 12px",
+                    borderRadius: "10px",
+                    border: isSelectedEntry ? "1px solid #86efac" : "none",
+                    background: isSelectedEntry ? "#dcfce7" : "linear-gradient(135deg, #0284c7 0%, #2563eb 100%)",
+                    color: isSelectedEntry ? "#166534" : "#ffffff",
                     fontSize: "12px",
-                    fontWeight: 600,
+                    fontWeight: 700,
+                    fontFamily: "var(--font-heading)",
                     cursor: isSelectedEntry ? "default" : "pointer",
+                    boxShadow: isSelectedEntry ? "none" : "0 2px 8px rgba(37, 99, 235, 0.25)",
                   }}
                 >
                   {isSelectedEntry ? "✓ Entry Point" : "Set Entry Point"}
@@ -335,14 +356,16 @@ export default function AnalysisPanel({
                   onClick={() => onSimulate(selectedNode.id)}
                   style={{
                     flex: 1,
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    border: "1px solid #dc2626",
-                    background: "#b91c1c",
+                    padding: "9px 12px",
+                    borderRadius: "10px",
+                    border: "none",
+                    background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
                     color: "white",
                     fontSize: "12px",
-                    fontWeight: 600,
+                    fontWeight: 700,
+                    fontFamily: "var(--font-heading)",
                     cursor: "pointer",
+                    boxShadow: "0 2px 8px rgba(239, 68, 68, 0.25)",
                   }}
                 >
                   Simulate Failure
@@ -355,13 +378,14 @@ export default function AnalysisPanel({
                   style={{
                     width: "100%",
                     marginTop: "8px",
-                    padding: "7px 10px",
-                    borderRadius: "6px",
-                    border: "1px solid #451a1a",
-                    background: "rgba(239, 68, 68, 0.1)",
-                    color: "#fca5a5",
-                    fontSize: "11px",
-                    fontWeight: 600,
+                    padding: "8px 12px",
+                    borderRadius: "10px",
+                    border: "1px solid #fecaca",
+                    background: "#fef2f2",
+                    color: "#dc2626",
+                    fontSize: "11.5px",
+                    fontWeight: 700,
+                    fontFamily: "var(--font-heading)",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -374,8 +398,8 @@ export default function AnalysisPanel({
               )}
             </div>
           ) : (
-            <div style={{ textAlign: "center", padding: "14px 6px", color: "#64748b", fontSize: "12px" }}>
-              <div style={{ fontSize: "20px", marginBottom: "4px" }}>👆</div>
+            <div style={{ textAlign: "center", padding: "18px 8px", color: "#64748b", fontSize: "12.5px" }}>
+              <div style={{ fontSize: "22px", marginBottom: "6px" }}>👆</div>
               Click any component on the canvas to set it as Entry Point or simulate its failure.
             </div>
           )}
@@ -383,7 +407,7 @@ export default function AnalysisPanel({
 
         {/* 3. Auto-Detect Failure Points (Auto Scan) */}
         <PanelCard title="Auto-Detect Weak Points" icon="🔍">
-          <p style={{ fontSize: "12px", color: "#94a3b8", lineHeight: 1.4, margin: "0 0 10px" }}>
+          <p style={{ fontSize: "12px", color: "#64748b", lineHeight: 1.4, margin: "0 0 12px" }}>
             Scans the entire architecture to detect single points of failure without manual testing.
           </p>
 
@@ -392,14 +416,16 @@ export default function AnalysisPanel({
               onClick={onDetectFailurePoints}
               style={{
                 flex: 1,
-                padding: "8px 12px",
-                borderRadius: "6px",
-                border: "1px solid #8b5cf6",
-                background: "#6d28d9",
+                padding: "9px 14px",
+                borderRadius: "10px",
+                border: "none",
+                background: "linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)",
                 color: "white",
                 fontSize: "12px",
-                fontWeight: 600,
+                fontWeight: 800,
+                fontFamily: "var(--font-heading)",
                 cursor: "pointer",
+                boxShadow: "0 3px 10px rgba(124, 58, 237, 0.25)",
               }}
             >
               Scan Architecture
@@ -408,12 +434,14 @@ export default function AnalysisPanel({
               <button
                 onClick={onClearRiskScan}
                 style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #334155",
-                  background: "#1e293b",
-                  color: "#94a3b8",
+                  padding: "9px 14px",
+                  borderRadius: "10px",
+                  border: "1px solid #cbd5e1",
+                  background: "#ffffff",
+                  color: "#64748b",
                   fontSize: "12px",
+                  fontWeight: 700,
+                  fontFamily: "var(--font-heading)",
                   cursor: "pointer",
                 }}
               >
@@ -425,12 +453,13 @@ export default function AnalysisPanel({
           {riskScanMessage && (
             <div
               style={{
-                padding: "8px 10px",
-                background: "rgba(245, 158, 11, 0.12)",
-                border: "1px solid rgba(245, 158, 11, 0.25)",
-                borderRadius: "6px",
-                color: "#fbbf24",
-                fontSize: "11px",
+                padding: "8px 12px",
+                background: "#fef3c7",
+                border: "1px solid #fde68a",
+                borderRadius: "8px",
+                color: "#92400e",
+                fontSize: "11.5px",
+                fontWeight: 600,
                 marginBottom: "8px",
               }}
             >
@@ -439,9 +468,9 @@ export default function AnalysisPanel({
           )}
 
           {riskScan && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "8px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "10px" }}>
               {riskScan.length === 0 ? (
-                <div style={{ color: "#22c55e", fontSize: "12px", textAlign: "center", padding: "8px" }}>
+                <div style={{ color: "#16a34a", fontSize: "12px", fontWeight: 600, textAlign: "center", padding: "10px" }}>
                   No components to scan. Add components and set an Entry Point.
                 </div>
               ) : (
@@ -451,20 +480,24 @@ export default function AnalysisPanel({
                     <div
                       key={r.nodeId}
                       style={{
-                        padding: "8px 10px",
-                        borderRadius: "6px",
-                        background: r.singlePointOfFailure ? "rgba(192, 132, 252, 0.1)" : "#0f172a",
-                        border: r.singlePointOfFailure ? "1px solid #c084fc" : "1px solid #1e293b",
+                        padding: "10px 12px",
+                        borderRadius: "10px",
+                        background: r.singlePointOfFailure ? "#faf5ff" : "#ffffff",
+                        border: r.singlePointOfFailure ? "1.5px solid #d8b4fe" : "1px solid #e2e8f0",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontWeight: 600, fontSize: "12px", color: "#f8fafc" }}>{r.label}</span>
+                        <span style={{ fontWeight: 800, fontSize: "12.5px", color: "#0f172a", fontFamily: "var(--font-heading)" }}>
+                          {r.label}
+                        </span>
                         <span
                           style={{
                             fontSize: "10px",
-                            fontWeight: 700,
-                            padding: "2px 6px",
-                            borderRadius: "4px",
+                            fontWeight: 800,
+                            fontFamily: "var(--font-heading)",
+                            padding: "2px 7px",
+                            borderRadius: "6px",
                             background: meta.bg,
                             color: meta.text,
                             border: `1px solid ${meta.border}`,
@@ -473,7 +506,7 @@ export default function AnalysisPanel({
                           {r.resilience}
                         </span>
                       </div>
-                      <div style={{ fontSize: "11px", color: r.singlePointOfFailure ? "#d8b4fe" : "#64748b", marginTop: "4px" }}>
+                      <div style={{ fontSize: "11px", color: r.singlePointOfFailure ? "#7e22ce" : "#64748b", fontWeight: 600, marginTop: "4px" }}>
                         {r.singlePointOfFailure
                           ? `⚠️ Single Point of Failure — breaks ${r.newlyUnreachableCount} node${r.newlyUnreachableCount === 1 ? "" : "s"}`
                           : "✓ Not a single point of failure"}
