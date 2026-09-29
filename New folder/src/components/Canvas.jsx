@@ -21,10 +21,10 @@ import { toCanonicalArchitecture } from "../utils/architecture";
 import { buildFallbackExplanation, requestAiExplanation, validateAiExplanation } from "../utils/aiExplain";
 import { generateTerraform } from "../utils/terraformGenerator";
 import TerraformModal from "./TerraformModal";
-import AiKeyModal from "./AiKeyModal";
+import GeminiKeyModal from "./GeminiKeyModal";
 import AiGeneratorModal from "./AiGeneratorModal";
 import AiCopilotModal from "./AiCopilotModal";
-import { hasAnyApiKey } from "../services/aiRouter";
+import { hasGeminiApiKey } from "../services/geminiService";
 
 const nodeTypes = { cloudNode: CloudNode, regionGroup: RegionGroupNode, container: ContainerNode };
 
@@ -135,10 +135,10 @@ function CanvasInner({ onExport, initialArchitecture }) {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [showCopilotModal, setShowCopilotModal] = useState(false);
   const [showGeneratorModal, setShowGeneratorModal] = useState(false);
-  const [isAiReady, setIsAiReady] = useState(hasAnyApiKey());
+  const [isGeminiReady, setIsGeminiReady] = useState(hasGeminiApiKey());
 
   useEffect(() => {
-    setIsAiReady(hasAnyApiKey());
+    setIsGeminiReady(hasGeminiApiKey());
   }, [showKeyModal]);
 
   useEffect(() => {
@@ -578,10 +578,10 @@ function CanvasInner({ onExport, initialArchitecture }) {
             title="Configure Google Gemini Free Tier API Key"
             style={{
               padding: "6px 12px",
-              background: isAiReady ? "#f0fdf4" : "#fefce8",
-              border: `1.5px solid ${isAiReady ? "#86efac" : "#fef08a"}`,
+              background: isGeminiReady ? "#f0fdf4" : "#fefce8",
+              border: `1.5px solid ${isGeminiReady ? "#86efac" : "#fef08a"}`,
               borderRadius: "12px",
-              color: isAiReady ? "#166534" : "#854d0e",
+              color: isGeminiReady ? "#166534" : "#854d0e",
               fontSize: "11.5px",
               fontWeight: 800,
               fontFamily: "var(--font-heading)",
@@ -596,12 +596,12 @@ function CanvasInner({ onExport, initialArchitecture }) {
                 width: "8px",
                 height: "8px",
                 borderRadius: "50%",
-                background: isAiReady ? "#22c55e" : "#eab308",
-                boxShadow: isAiReady ? "0 0 8px #22c55e" : "0 0 8px #eab308",
+                background: isGeminiReady ? "#22c55e" : "#eab308",
+                boxShadow: isGeminiReady ? "0 0 8px #22c55e" : "0 0 8px #eab308",
                 display: "inline-block",
               }}
             />
-            <span>{isAiReady ? "AI Ready (Free Tier)" : "Set Free AI Key"}</span>
+            <span>{isGeminiReady ? "Gemini AI (Free Tier)" : "Set Free Gemini Key"}</span>
           </button>
 
           {!entryPointId && (
@@ -634,27 +634,8 @@ function CanvasInner({ onExport, initialArchitecture }) {
           nodeTypes={nodeTypes}
           fitView
         >
-          <Background
-            variant="dots"
-            gap={20}
-            size={1.8}
-            color="#94a3b8"
-          />
-          <Controls
-            position="bottom-left"
-            showZoom={true}
-            showFitView={true}
-            showInteractive={true}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 6px 18px rgba(0, 0, 0, 0.12)",
-              borderRadius: "12px",
-              background: "#ffffff",
-              border: "1.5px solid #cbd5e1",
-              zIndex: 20,
-            }}
-          />
+          <Background color="#cbd5e1" gap={16} />
+          <Controls />
           <MiniMap style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px" }} />
         </ReactFlow>
       </div>
@@ -688,10 +669,10 @@ function CanvasInner({ onExport, initialArchitecture }) {
         region={activeRegion}
       />
 
-      <AiKeyModal
+      <GeminiKeyModal
         isOpen={showKeyModal}
         onClose={() => setShowKeyModal(false)}
-        onKeySaved={() => setIsAiReady(hasAnyApiKey())}
+        onKeySaved={() => setIsGeminiReady(hasGeminiApiKey())}
       />
 
       <AiGeneratorModal

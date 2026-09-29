@@ -88,7 +88,7 @@ export function validateAiExplanation(aiResponse, { architecture, simResult }) {
   return { valid: reasons.length === 0, reasons };
 }
 
-import { explainSimulationFailure } from "../services/aiRouter";
+import { explainSimulationFailure } from "../services/geminiService";
 
 /**
  * Requests an AI explanation using Google's free Gemini API.
